@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri May 10 09:12:02 2019
+Created on Feb 2018
 
-@author: 20786136
+@author: Salman
 """
 
 # function to print triplets with 0 sum  

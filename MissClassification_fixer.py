@@ -93,6 +93,36 @@ print("Classification report:\n", classification_report(y_test, y_pred))
 
 # ... (Same imports, preprocessing, training, and evaluation code as before)
 
+# Calculate macro-average ROC curve and ROC area
+n_classes = len(np.unique(y))
+y_test_bin = label_binarize(y_test, classes=np.arange(n_classes))
+y_score = clf.decision_function(X_test)
+
+fpr = dict()
+tpr = dict()
+roc_auc = dict()
+
+for i in range(n_classes):
+    fpr[i], tpr[i], _ = roc_curve(y_test_bin[:, i], y_score[:, i])
+    roc_auc[i] = auc(fpr[i], tpr[i])
+
+# Compute micro-average ROC curve and ROC area
+fpr["micro"], tpr["micro"], _ = roc_curve(y_test_bin.ravel(), y_score.ravel())
+roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+# Aggregate all false positive rates
+all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+
+# Interpolate all ROC curves at this points
+mean_tpr = np.zeros_like(all_fpr)
+for i in range(n_classes):
+    mean_tpr += np.interp(all_fpr, fpr[i], tpr[i])
+
+# Average the TPR values and compute AUC
+mean_tpr /= n_classes
+fpr["macro"] = all_fpr
+tpr["macro"] = mean_tpr
+roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
 # Plot confusion matrix with class names
 conf_mat = confusion_matrix(y_test, y_pred)
 plt.figure(figsize=(10, 10))

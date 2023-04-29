@@ -28,7 +28,7 @@ encoder = LabelEncoder()
 y = encoder.fit_transform(df['Name'])
 
 # Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test, train_index, test_index = train_test_split(X, y, df.index, test_size=0.2, random_state=42, stratify=y)
 
 # Train a classifier
 clf = LogisticRegression()
@@ -41,9 +41,10 @@ print("Classification report:\n", classification_report(y_test, y_pred))
 
 # Predict and verify using the 'Correct' column
 predicted_names = encoder.inverse_transform(y_pred)
-df_test = df.iloc[y_test.index]
+df_test = df.iloc[test_index].copy()
 df_test['predicted_name'] = predicted_names
 df_test['prediction_correct'] = (df_test['Name'] == df_test['predicted_name']) & (df_test['Correct'] == "Yes")
+
 
 # Display the verification results
 print("Number of correct predictions:", df_test['prediction_correct'].sum())

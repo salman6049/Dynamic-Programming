@@ -380,9 +380,10 @@ def plot_multiple_model_accuracies(sorted_models):
 ##Graph 3
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.metrics import accuracy_score
 
-def plot_multiple_model_accuracies(sorted_models):
-    num_models = len(sorted_models)
+def plot_classifier_accuracies(classifiers, best_params, X_train, y_train, X_test, y_test):
+    num_models = len(classifiers)
     num_rows = 2
     num_cols = 3
     
@@ -392,30 +393,23 @@ def plot_multiple_model_accuracies(sorted_models):
     # Set figure size
     fig, axes = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(18, 12), sharex=True)
 
-    for idx, (history, model_name) in enumerate(sorted_models):
+    for idx, (name, clf) in enumerate(classifiers.items()):
         row, col = divmod(idx, num_cols)
         
+        clf.set_params(**best_params[name])
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        
         # Plot training and validation accuracies for each model
-        axes[row, col].plot(history['accuracy'], linestyle='--', marker='o', markersize=10, linewidth=3, label=f'Training Accuracy', alpha=0.8, color='blue')
-        axes[row, col].plot(history['val_accuracy'], linestyle='-', marker='s', markersize=10, linewidth=3, label=f'Validation Accuracy', alpha=0.8, color='orange')
+        axes[row, col].bar(['Accuracy'], [accuracy], color=['blue'])
 
         # Set axis labels and font size
-        axes[row, col].set_xlabel('Epoch', fontsize=14, labelpad=10)
-        axes[row, col].set_ylabel('Accuracy', fontsize=14, labelpad=10)
+        axes[row, col].set_xlabel('Metric', fontsize=14, labelpad=10)
+        axes[row, col].set_ylabel('Score', fontsize=14, labelpad=10)
 
         # Set title and font size
-        axes[row, col].set_title(f'{model_name}', fontsize=18, pad=15)
-
-        # Set legend location and font size
-        axes[row, col].legend(loc='lower right', fontsize=10, frameon=True, facecolor='white', edgecolor='black', framealpha=0.8)
-
-        # Calculate average training and validation accuracies
-        avg_train_accuracy = sum(history['accuracy']) / len(history['accuracy'])
-        avg_val_accuracy = sum(history['val_accuracy']) / len(history['val_accuracy'])
-
-        # Add text labels for average training and validation accuracies
-        axes[row, col].text(0.5, 0.1, f"Avg. Training Accuracy: {avg_train_accuracy:.2f}", fontsize=12, transform=axes[row, col].transAxes)
-        axes[row, col].text(0.5, 0.05, f"Avg. Validation Accuracy: {avg_val_accuracy:.2f}", fontsize=12, transform=axes[row, col].transAxes)
+        axes[row, col].set_title(f'{name}', fontsize=18, pad=15)
 
         # Customize tick font size
         axes[row, col].tick_params(axis='both', which='major', labelsize=12)
@@ -431,4 +425,5 @@ def plot_multiple_model_accuracies(sorted_models):
 
     # Display the plot
     plt.show()
+
 

@@ -296,4 +296,139 @@ for name, clf in classifiers.items():
     plt.legend(loc="lower right")
     plt.show()
 
+### Graph 1
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Set Seaborn style
+sns.set_style("whitegrid")
+
+# Set figure size
+plt.figure(figsize=(10, 6))
+
+# Plot training and validation accuracies with customized line styles and markers
+plt.plot(history.history['accuracy'], linestyle='--', marker='o', markersize=8, linewidth=2, label='Training Accuracy', color='blue')
+plt.plot(history.history['val_accuracy'], linestyle='-', marker='s', markersize=8, linewidth=2, label='Validation Accuracy', color='orange')
+
+# Set axis labels and font size
+plt.xlabel('Epoch', fontsize=14)
+plt.ylabel('Accuracy', fontsize=14)
+
+# Set title and font size
+plt.title('Training vs. Validation Accuracy', fontsize=18)
+
+# Set legend location and font size
+plt.legend(loc='lower right', fontsize=12)
+
+# Customize tick font size
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+
+# Add a grid for better visualization
+plt.grid(True)
+
+# Display the plot
+plt.show()
+
+### Graph2
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_multiple_model_accuracies(sorted_models):
+    num_models = len(sorted_models)
+    num_rows = 2
+    num_cols = 3
+    
+    # Set Seaborn style
+    sns.set_style("whitegrid")
+
+    # Set figure size
+    fig, axes = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(18, 12), sharex=True)
+
+    for idx, (history, model_name) in enumerate(sorted_models):
+        row, col = divmod(idx, num_cols)
+        
+        # Plot training and validation accuracies for each model
+        axes[row, col].plot(history['accuracy'], linestyle='--', marker='o', markersize=10, linewidth=3, label=f'Training Accuracy', alpha=0.8, color='blue')
+        axes[row, col].plot(history['val_accuracy'], linestyle='-', marker='s', markersize=10, linewidth=3, label=f'Validation Accuracy', alpha=0.8, color='orange')
+
+        # Set axis labels and font size
+        axes[row, col].set_xlabel('Epoch', fontsize=14, labelpad=10)
+        axes[row, col].set_ylabel('Accuracy', fontsize=14, labelpad=10)
+
+        # Set title and font size
+        axes[row, col].set_title(f'{model_name}', fontsize=18, pad=15)
+
+        # Set legend location and font size
+        axes[row, col].legend(loc='lower right', fontsize=10, frameon=True, facecolor='white', edgecolor='black', framealpha=0.8)
+
+        # Customize tick font size
+        axes[row, col].tick_params(axis='both', which='major', labelsize=12)
+
+        # Add a grid for better visualization
+        axes[row, col].grid(True)
+
+        # Remove top and right spines for a cleaner look
+        sns.despine(top=True, right=True, ax=axes[row, col])
+
+    # Adjust the space between subplots
+    plt.subplots_adjust(hspace=0.4, wspace=0.3)
+
+    # Display the plot
+    plt.show()
+
+##Graph 3
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_multiple_model_accuracies(sorted_models):
+    num_models = len(sorted_models)
+    num_rows = 2
+    num_cols = 3
+    
+    # Set Seaborn style
+    sns.set_style("whitegrid")
+
+    # Set figure size
+    fig, axes = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(18, 12), sharex=True)
+
+    for idx, (history, model_name) in enumerate(sorted_models):
+        row, col = divmod(idx, num_cols)
+        
+        # Plot training and validation accuracies for each model
+        axes[row, col].plot(history['accuracy'], linestyle='--', marker='o', markersize=10, linewidth=3, label=f'Training Accuracy', alpha=0.8, color='blue')
+        axes[row, col].plot(history['val_accuracy'], linestyle='-', marker='s', markersize=10, linewidth=3, label=f'Validation Accuracy', alpha=0.8, color='orange')
+
+        # Set axis labels and font size
+        axes[row, col].set_xlabel('Epoch', fontsize=14, labelpad=10)
+        axes[row, col].set_ylabel('Accuracy', fontsize=14, labelpad=10)
+
+        # Set title and font size
+        axes[row, col].set_title(f'{model_name}', fontsize=18, pad=15)
+
+        # Set legend location and font size
+        axes[row, col].legend(loc='lower right', fontsize=10, frameon=True, facecolor='white', edgecolor='black', framealpha=0.8)
+
+        # Calculate average training and validation accuracies
+        avg_train_accuracy = sum(history['accuracy']) / len(history['accuracy'])
+        avg_val_accuracy = sum(history['val_accuracy']) / len(history['val_accuracy'])
+
+        # Add text labels for average training and validation accuracies
+        axes[row, col].text(0.5, 0.1, f"Avg. Training Accuracy: {avg_train_accuracy:.2f}", fontsize=12, transform=axes[row, col].transAxes)
+        axes[row, col].text(0.5, 0.05, f"Avg. Validation Accuracy: {avg_val_accuracy:.2f}", fontsize=12, transform=axes[row, col].transAxes)
+
+        # Customize tick font size
+        axes[row, col].tick_params(axis='both', which='major', labelsize=12)
+
+        # Add a grid for better visualization
+        axes[row, col].grid(True)
+
+        # Remove top and right spines for a cleaner look
+        sns.despine(top=True, right=True, ax=axes[row, col])
+
+    # Adjust the space between subplots
+    plt.subplots_adjust(hspace=0.4, wspace=0.3)
+
+    # Display the plot
+    plt.show()
 

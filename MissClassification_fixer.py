@@ -581,3 +581,53 @@ def plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test):
     plt.show()
 
 plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test)
+
+######## Learning Curve
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test):
+    # Create a list of the fractions of the training data to use
+    train_sizes = np.linspace(0.1, 1.0, 10)
+
+    # Create subplots for each classifier
+    fig, axes = plt.subplots(nrows=1, ncols=len(classifiers), figsize=(5*len(classifiers), 4))
+
+    for ax, (name, clf) in zip(axes, classifiers.items()):
+        train_acc = []
+        test_acc = []
+
+        for train_size in train_sizes:
+            # Train the model on a fraction of the training data
+            n_train = int(train_size * X_train.shape[0])
+            clf.fit(X_train[:n_train], y_train[:n_train])
+
+            # Calculate the training accuracy
+            y_train_pred = clf.predict(X_train[:n_train])
+            train_acc.append(accuracy_score(y_train[:n_train], y_train_pred))
+
+            # Calculate the testing accuracy
+            y_test_pred = clf.predict(X_test)
+            test_acc.append(accuracy_score(y_test, y_test_pred))
+
+        # Plot the learning curve
+        ax.plot(train_sizes, train_acc, label='Training accuracy')
+        ax.plot(train_sizes, test_acc, label='Testing accuracy')
+        ax.set_title(name)
+        ax.set_xlabel('Training size')
+        ax.set_ylabel('Accuracy')
+        ax.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+# Create a dictionary of classifiers
+classifiers = {
+    'Logistic Regression': LogisticRegression(),
+    'Decision Tree': DecisionTreeClassifier(),
+    'Random Forest': RandomForestClassifier()
+}
+
+# Call the function to plot model accuracies
+plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test)

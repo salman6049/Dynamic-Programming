@@ -443,4 +443,71 @@ def plot_multiple_model_accuracies(sorted_models):
     # Display the plot
     plt.show()
 
+####### Aded on May 15
+import matplotlib.pyplot as plt
+import seaborn as sns
+import math
+from sklearn.metrics import accuracy_score
+
+# dictionary to hold the accuracy results
+accuracy_dict = {}
+
+for name, clf in classifiers.items():
+    clf.set_params(**best_params[name])
+    clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"{name}: {accuracy:.2f}")
+    # store the accuracy in the dictionary
+    accuracy_dict[name] = accuracy
+
+def plot_model_accuracies(accuracy_dict):
+    num_models = len(accuracy_dict)
+    num_cols = 3
+    num_rows = math.ceil(num_models / num_cols) # Calculate the number of rows needed
+
+    # Set Seaborn style
+    sns.set_style("whitegrid")
+
+    # Set figure size
+    fig, axes = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(18, 12), sharex=True)
+
+    # Flatten axes array if there's only one row
+    if num_rows == 1:
+        axes = axes.flatten()
+
+    for idx, (model_name, accuracy) in enumerate(accuracy_dict.items()):
+        row, col = divmod(idx, num_cols)
+        # Plot accuracy for each model
+        axes[row, col].bar(model_name, accuracy, color='blue')
+
+        # Set axis labels and font size
+        axes[row, col].set_xlabel('Model', fontsize=14, labelpad=10)
+        axes[row, col].set_ylabel('Accuracy', fontsize=14, labelpad=10)
+
+        # Set title and font size
+        axes[row, col].set_title(f'{model_name}', fontsize=18, pad=15)
+
+        # Customize tick font size
+        axes[row, col].tick_params(axis='both', which='major', labelsize=12)
+
+        # Add a grid for better visualization
+        axes[row, col].grid(True)
+
+        # Remove top and right spines for a cleaner look
+        sns.despine(top=True, right=True, ax=axes[row, col])
+
+    # If there are fewer models than subplots, hide the extra subplots
+    if num_models < num_rows * num_cols:
+        for idx in range(num_models, num_rows * num_cols):
+            row, col = divmod(idx, num_cols)
+            fig.delaxes(axes[row][col])
+
+    # Adjust the space between subplots
+    plt.subplots_adjust(hspace=0.4, wspace=0.3)
+
+    # Display the plot
+    plt.show()
+
+plot_model_accuracies(accuracy_dict)
 

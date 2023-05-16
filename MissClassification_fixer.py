@@ -472,9 +472,9 @@ def plot_model_accuracies(accuracy_dict):
     # Set figure size
     fig, axes = plt.subplots(nrows=num_rows, ncols=num_cols, figsize=(18, 12), sharex=True)
 
-    # Flatten axes array if there's only one row
+    # Ensure axes is always 2-dimensional
     if num_rows == 1:
-        axes = axes.flatten()
+        axes = axes.reshape(1, -1)
 
     for idx, (model_name, accuracy) in enumerate(accuracy_dict.items()):
         row, col = divmod(idx, num_cols)
@@ -510,4 +510,5 @@ def plot_model_accuracies(accuracy_dict):
     plt.show()
 
 plot_model_accuracies(accuracy_dict)
+
 

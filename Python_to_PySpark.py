@@ -119,3 +119,45 @@ df1 = df1.withColumn("header_related_id", get_related_ids(df1["header_related_in
 
 result = df1
 
+##### Second Solution
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import udf, col
+from pyspark.sql.types import ArrayType, IntegerType, StringType
+from rapidfuzz import fuzz
+
+spark = SparkSession.builder.getOrCreate()
+
+# Function to generate similarity score
+def combined_similarity(string1, string2):
+    token_set_ratio = fuzz.token_set_ratio(string1, string2)
+    character_ratio = fuzz.ratio(string1, string2)
+    return (token_set_ratio + character_ratio) / 2
+
+def calculate_similarity_for_matching_product_type(x, y):
+    if x[1] == y[1]:
+        return combined_similarity(x[0].lower(), y[0].lower())
+    else:
+        return 0
+
+# UDF to calculate similarity scores
+calculate_similarity = udf(calculate_similarity_for_matching_product_type, FloatType())
+
+# Load your dataframes as Spark dataframes
+# df1 = spark.createDataFrame(CT_df)
+# df2 = spark.createDataFrame(Do_df)
+
+# Perform a cross-join
+cross_df = df1.crossJoin(df2)
+
+# Calculate similarity scores
+cross_df = cross_df.withColumn("similarity_scores", calculate_similarity(array(col("df1.casename"), col("df1.court")), array(col("df2.casename"), col("df2.court"))))
+
+# Filter rows based on threshold
+filtered_df = cross_df.filter(col("similarity_scores") > 0.8)
+
+# Extract IDs for rows with similarity score above the threshold
+get_ids = udf(lambda x: [df2.loc[i, 'ID'] for i in x], ArrayType(IntegerType()))
+result_df = filtered_df.withColumn("related_ids", get_ids(col("similarity_scores")))
+
+result_df.show()

@@ -583,16 +583,15 @@ def plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test):
 plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test)
 
 ######## Learning Curve
-from sklearn.metrics import accuracy_score
-import matplotlib.pyplot as plt
-import numpy as np
-
 def plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test):
     # Create a list of the fractions of the training data to use
     train_sizes = np.linspace(0.1, 1.0, 10)
 
     # Create subplots for each classifier
-    fig, axes = plt.subplots(nrows=1, ncols=len(classifiers), figsize=(5*len(classifiers), 4))
+    nrows = 3
+    ncols = 2
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(5*ncols, 4*nrows))
+    axes = axes.ravel()  # Flatten axes for easier iteration
 
     for ax, (name, clf) in zip(axes, classifiers.items()):
         train_acc = []
@@ -621,13 +620,6 @@ def plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test):
 
     plt.tight_layout()
     plt.show()
-
-# Create a dictionary of classifiers
-classifiers = {
-    'Logistic Regression': LogisticRegression(),
-    'Decision Tree': DecisionTreeClassifier(),
-    'Random Forest': RandomForestClassifier()
-}
 
 # Call the function to plot model accuracies
 plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test)

@@ -623,3 +623,102 @@ def plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test):
 
 # Call the function to plot model accuracies
 plot_model_accuracies(classifiers, X_train, y_train, X_test, y_test)
+
+############################################################3
+############################################################
+#################### Word2Vector
+import pandas as pd
+import numpy as np
+from gensim.models import Word2Vec
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score
+from sklearn import utils
+import nltk
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import svm
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn import svm
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import roc_auc_score
+
+# Load your dataframe (replace with your own dataframe)
+# df = pd.read_csv('your_data.csv')
+
+# Preprocess the text data (you can add more preprocessing steps)
+df['news_headline'] = df['news_headline'].str.lower()
+df['News_Full_story'] = df['News_Full_story'].str.lower()
+df['Full_Text'] = df['news_headline'] + " " + df['News_Full_story']
+
+# Tokenize the sentences
+df['Full_Text'] = df['Full_Text'].apply(nltk.word_tokenize)
+
+# Train a Word2Vec model
+model = Word2Vec(df['Full_Text'], min_count=1, vector_size=100)  # Use a vector size that suits your data
+
+# Get document vectors
+def document_vector(doc):
+    # remove out-of-vocabulary words
+    doc = [word for word in doc if word in model.wv.key_to_index]
+    return np.mean(model.wv[doc], axis=0)
+
+df['doc_vector'] = df['Full_Text'].apply(document_vector)
+
+# Prepare inputs for sklearn
+X = np.vstack(df['doc_vector'].to_numpy())
+y = df['Name']
+
+# Encode the target variable
+encoder = LabelEncoder()
+y = encoder.fit_transform(y)
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+# Define the models
+
+
+models = {
+    'LogisticRegression': LogisticRegression(),
+    'RandomForest': RandomForestClassifier(),
+    'SVM': svm.SVC()
+}
+
+# Define the hyperparameters
+params = {
+    'LogisticRegression': {'C': [0.1, 1, 10]},
+    'RandomForest': {'n_estimators': [10, 50, 100], 'max_depth': [None, 5, 10]},
+    'SVM': {'C': [0.1, 1, 10], 'kernel': ['linear', 'rbf']}
+}
+
+# Iterate over models and parameter grids
+for model_name, model in models.items():
+    grid_search = GridSearchCV(model, params[model_name], cv=5)
+    grid_search.fit(X_train, y_train)
+    y_pred = grid_search.predict(X_test)
+    print(f"Model: {model_name}")
+    print("Best parameters:", grid_search.best_params_)
+    print("Accuracy:", accuracy_score(y_test, y_pred))
+    print("Classification report:\n", classification_report(y_test, y_pred))
+    print("----------------------------------------------------\n")
+
+
+
+# Create a function for computing the multi-class ROC AUC score
+def multiclass_roc_auc_score(y_test, y_pred_proba, average="macro"):
+    roc_auc = roc_auc_score(y_test, y_pred_proba, multi_class="ovr", average=average)
+    return roc_auc
+
+# Iterate over models and parameter grids
+for model_name, model in models.items():
+    grid_search = GridSearchCV(model, params[model_name], cv=5)
+    grid_search.fit(X_train, y_train)
+    y_pred = grid_search.predict(X_test)
+    y_pred_proba = grid_search.predict_proba(X_test)  # Predict class probabilities
+    print(f"Model: {model_name}")
+    print("Best parameters:", grid_search.best_params_)
+    print("Accuracy:", accuracy_score(y_test, y_pred))
+    print("ROC AUC score:", multiclass_roc_auc_score(y_test, y_pred_proba))
+    print("Classification report:\n", classification_report(y_test, y_pred))
+    print("----------------------------------------------------\n")

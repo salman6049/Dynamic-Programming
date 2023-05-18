@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 from sklearn.metrics import plot_confusion_matrix, plot_roc_curve, plot_precision_recall_curve
 from sklearn.model_selection import learning_curve
 
@@ -35,20 +29,21 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None,
     plt.legend(loc="best")
     return plt
 
-# Assuming clf is your trained classifier and X_test and y_test are your testing data
-# Confusion Matrix
-plot_confusion_matrix(clf, X_test, y_test)
-plt.show()
+# Assuming classifiers is your dictionary of classifiers and X_test and y_test are your testing data
+for name, clf in classifiers.items():
+    print(name)
+    # Confusion Matrix
+    plot_confusion_matrix(clf, X_test, y_test)
+    plt.show()
 
-# ROC Curve
-plot_roc_curve(clf, X_test, y_test)
-plt.show()
+    # ROC Curve
+    plot_roc_curve(clf, X_test, y_test)
+    plt.show()
 
-# Precision-Recall curve
-plot_precision_recall_curve(clf, X_test, y_test)
-plt.show()
+    # Precision-Recall curve
+    plot_precision_recall_curve(clf, X_test, y_test)
+    plt.show()
 
-# Learning curve
-plot_learning_curve(clf, "Learning curve", X_train, y_train, cv=5)
-plt.show()
-
+    # Learning curve
+    plot_learning_curve(clf, name + " Learning curve", X_train, y_train, cv=5)
+    plt.show()

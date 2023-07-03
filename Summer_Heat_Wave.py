@@ -90,6 +90,33 @@ for i in range(y_test.shape[1]):
 
 
 # In[9]:
+# Import necessary libraries
+from sklearn.metrics import classification_report
+
+# List to store your derived features
+derived_cols = ['derived_1', 'derived_2', 'derived_3']
+
+for derived in derived_cols:
+    # Transform derived columns into numerical format
+    mlb = MultiLabelBinarizer()
+    y = pd.DataFrame(mlb.fit_transform(df[derived].fillna('missing').str.split()), columns=mlb.classes_)
+
+    # Split data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Create and train the RandomForest model
+    rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf_model.fit(X_train, y_train)
+
+    # Make predictions on the test data
+    y_pred = rf_model.predict(X_test)
+
+    # Evaluate the model for each derived feature
+    print(f"\nRandom Forest Classifier Results for {derived}:")
+    print(classification_report(y_test, y_pred, zero_division=0, target_names=mlb.classes_))
+
+
+
 
 
 import scipy.stats as ss
